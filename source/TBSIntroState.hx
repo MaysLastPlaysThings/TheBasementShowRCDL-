@@ -118,6 +118,7 @@ class TBSIntroState extends MusicBeatState
                 return;
             }
             #else
+            MusicBeatState.switchState(new TitleState()); 
             FlxG.log.warn('Platform not supported!');
             return;
             #end

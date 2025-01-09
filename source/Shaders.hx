@@ -179,40 +179,37 @@ class MenusGlow extends FlxShader
 
 // GAUSSIAN BLUR SETTINGS
 uniform float dim;
-float directions = 8.0;
-float quality = 4;
-//float directions = 16;
-//float quality = 30;
 uniform float size; 
 
 void main(void)
 { 
+    float directions = 8.0;
+    float quality = 4.0;
+
     vec2 uv = openfl_TextureCoordv.xy ;
 
     float Pi = 6.28318530718; // Pi*2
 
-    vec4 Color = texture2D( bitmap, uv);
+    vec4 Color = texture2D(bitmap, uv);
 
-	float aaply = 0.0;
+	  float aaply = 0.0;
 
-    for(float d=0.0; d<Pi; d+=Pi/directions){
-        for(float i=1.0/quality; i<=1.0; i+=1.0/quality){
+     for(float d = 0.0; d < Pi; d += Pi / directions){
+        for(float i = 1.0 / quality; i <= 1.0; i += 1.0 / quality){
 
-            float ex = (cos(d)*size*i)/openfl_TextureSize.x;
-            float why = (sin(d)*size*i)/openfl_TextureSize.y;
-            Color += flixel_texture2D( bitmap, uv+vec2(ex,why));
-			aaply += dim;
+            float ex = (cos(d) * size * i) / openfl_TextureSize.x;
+            float why = (sin(d) * size * i) / openfl_TextureSize.y;
+            Color += flixel_texture2D(bitmap, uv + vec2(ex, why));
+            aaply += dim;
         }
     }
 
-    Color /= max(aaply - (directions - 1.0), 1);//(dim * quality) * directions - (directions - 1.0);
-    vec4 bloom =  (flixel_texture2D( bitmap, uv)/ dim)+Color;
+    Color /= max(aaply - (directions - 1.0), 1.0); // Certifique-se de usar 1.0 como float
+    vec4 bloom = (flixel_texture2D(bitmap, uv) / dim) + Color;
 
     gl_FragColor = bloom;
-
 }
     ')
-
     public function new() {
     super();
     dim.value = [2];
@@ -226,57 +223,54 @@ class MenusVCRShader extends FlxShader
 #pragma header
 
 #define round(a) floor(a + 0.5)
-#define texture flixel_texture2D
 #define iResolution openfl_TextureSize
 uniform float nothingNess;
+#define texture flixel_texture2D
 #define iChannel0 bitmap
-uniform sampler2D iChannel1;
-uniform sampler2D iChannel2;
-uniform sampler2D iChannel3;
 
 vec2 curve(vec2 uv)
 {
-	uv = (uv - 0.5) * 2.0;
-	uv *= 1.1;	
-	uv.x *= 1.0 + pow((abs(uv.y) / 5.0), 2.0);
-	uv.y *= 1.0 + pow((abs(uv.x) / 4.0), 2.0);
-	uv  = (uv / 2.0) + 0.5;
-	uv =  uv *0.92 + 0.04;
-	return uv;
+    uv = (uv - 0.5) * 2.0;
+    uv *= 1.1;    
+    uv.x *= 1.0 + pow((abs(uv.y) / 5.0), 2.0);
+    uv.y *= 1.0 + pow((abs(uv.x) / 4.0), 2.0);
+    uv  = (uv / 2.0) + 0.5;
+    uv =  uv * 0.92 + 0.04;
+    return uv;
 }
 
-void mainImage( out vec4 fragColor, in vec2 fragCoord )
+void mainImage(out vec4 fragColor, in vec2 fragCoord)
 {
-    //Curve
     vec2 uv = fragCoord.xy / iResolution.xy;
-	uv = curve( uv );
-    
+    uv = curve(uv);
+
     vec3 col;
 
     // Chromatic
-    col.r = texture(iChannel0,vec2(uv.x+0.002,uv.y)).x;
-    col.g = texture(iChannel0,vec2(uv.x,uv.y)).y;
-    col.b = texture(iChannel0,vec2(uv.x+0.002 * -1,uv.y)).z;
+    col.r = texture2D(iChannel0, vec2(uv.x + 0.002, uv.y)).x;
+    col.g = texture2D(iChannel0, vec2(uv.x, uv.y)).y;
+    col.b = texture2D(iChannel0, vec2(uv.x + 0.002 * -1.0, uv.y)).z;
 
     col *= step(0.0, uv.x) * step(0.0, uv.y);
     col *= 1.0 - step(1.0, uv.x) * 1.0 - step(1.0, uv.y);
 
-    col *= vec3(0.95,1.05,0.95);
+    col *= vec3(0.95, 1.05, 0.95);
 
-    col *= 0.5 + 0.5*16.0*uv.x*uv.y*(1.0-uv.x)*(1.0-uv.y);
+    col *= 0.5 + 0.5 * 16.0 * uv.x * uv.y * (1.0 - uv.x) * (1.0 - uv.y);
 
-    fragColor = vec4(col,texture(iChannel0, uv).a);
+    fragColor = vec4(col, texture2D(iChannel0, uv).a);
 }
 
 void main() {
-	mainImage(gl_FragColor, openfl_TextureCoordv*openfl_TextureSize);
+    mainImage(gl_FragColor, openfl_TextureCoordv * openfl_TextureSize);
 }
-    ')
 
-    public function new() {
-      super();
-      nothingNess.value = [2];
-    }
+')
+
+public function new() {
+  super();
+  nothingNess.value = [2];
+}
 }
 
 class ChromaticAberrationShader extends FlxShader
