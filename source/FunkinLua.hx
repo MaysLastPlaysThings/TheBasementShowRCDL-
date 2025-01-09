@@ -2558,6 +2558,7 @@ class FunkinLua {
 			return Assets.exists(Paths.getPath('assets/$filename', TEXT));
 			#end
 		});
+		#if MODS_ALLOWED
 		Lua_helper.add_callback(lua, "saveFile", function(path:String, content:String, ?absolute:Bool = false)
 		{
 			try {
@@ -2598,6 +2599,7 @@ class FunkinLua {
 			}
 			return false;
 		});
+		#end
 		Lua_helper.add_callback(lua, "getTextFromFile", function(path:String, ?ignoreModFolders:Bool = false) {
 			return Paths.getTextFromFile(path, ignoreModFolders);
 		});
@@ -2869,7 +2871,7 @@ class FunkinLua {
 		return PlayState.instance.modchartTexts.exists(name) ? PlayState.instance.modchartTexts.get(name) : Reflect.getProperty(PlayState.instance, name);
 	}
 
-	#if (!flash && sys)
+	#if MODS_ALLOWED
 	public function getShader(obj:String):FlxRuntimeShader
 	{
 		var killMe:Array<String> = obj.split('.');
@@ -2885,7 +2887,6 @@ class FunkinLua {
 		}
 		return null;
 	}
-	#end
 	
 	function initLuaShader(name:String, ?glslVersion:Int = 120)
 	{
@@ -2940,6 +2941,7 @@ class FunkinLua {
 		#end
 		return false;
 	}
+	#end // no shaders for now
 
 	function getGroupStuff(leArray:Dynamic, variable:String) {
 		var killMe:Array<String> = variable.split('.');

@@ -1668,7 +1668,6 @@ class PlayState extends MusicBeatState
 		CustomFadeTransition.nextCamera = camOther;
 	}
 
-	#if (!flash && sys)
 	public var runtimeShaders:Map<String, Array<String>> = new Map<String, Array<String>>();
 	public function createRuntimeShader(name:String):FlxRuntimeShader
 	{
@@ -1688,7 +1687,7 @@ class PlayState extends MusicBeatState
 		return null;
 		#end
 	}
-
+    #if MODS_ALLOWED
 	public function initLuaShader(name:String, ?glslVersion:Int = 120)
 	{
 		if(!ClientPrefs.shaders) return false;
@@ -1739,6 +1738,7 @@ class PlayState extends MusicBeatState
 		return false;
 	}
 	#end
+    // no shaders for now
 
 	function set_songSpeed(value:Float):Float
 	{
